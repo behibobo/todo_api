@@ -54,7 +54,7 @@ def get_item(id):
    res_data = {
       'id': item[0],
       'title': item[1],
-      'descrption': item[2],
+      'description': item[2],
       'done': item[3]
    }
 
