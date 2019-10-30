@@ -47,6 +47,9 @@ def token_required(f):
 
     return _verify
 
+@api.route('/', methods=('POST',))
+def home():
+    return jsonify("welcome to frontend class"), 200
 
 @api.route('/register', methods=('POST',))
 def register():
