@@ -16,10 +16,13 @@ api = Blueprint('api', __name__)
 @api.route('/')
 def home():
     return jsonify("welcome to frontend class"), 200
-
 @api.route('/register', methods=('POST',))
 def register():
     data = request.get_json()
+
+    existing_user = User.query.filter_by(email= data["email"]).first()
+    if(existing_user):
+        return jsonify({"error": "email alreay in use"}), 406
     user = User(**data)
     db.session.add(user)
     db.session.commit()
