@@ -6,7 +6,7 @@ api.py
 
 from flask import Blueprint, jsonify, request, current_app
 
-from .models import db, Item, User
+from .models import db, Story, User
 from flask_jwt_extended import (
     jwt_required, create_access_token,
     get_jwt_identity)
@@ -20,9 +20,9 @@ def home():
 def register():
     data = request.get_json()
 
-    existing_user = User.query.filter_by(email= data["email"]).first()
+    existing_user = User.query.filter_by(username= data["username"]).first()
     if(existing_user):
-        return jsonify({"error": "email alreay in use"}), 406
+        return jsonify({"error": "username alreay in use"}), 406
     user = User(**data)
     db.session.add(user)
     db.session.commit()
