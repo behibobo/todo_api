@@ -10,6 +10,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
+shared_stories = db.Table('shared_stories',
+    db.Column('story_id', db.Integer, db.ForeignKey('stories.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -27,6 +31,8 @@ class User(db.Model):
         self.last_name = last_name
         self.password = generate_password_hash(password, method='sha256')
 
+    def full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
     @classmethod
     def authenticate(cls, **kwargs):
         username = kwargs.get('username')
@@ -45,6 +51,7 @@ class User(db.Model):
         return dict(id=self.id, username=self.username)
 
 
+
 class Story(db.Model):
     __tablename__ = 'stories'
 
@@ -52,8 +59,13 @@ class Story(db.Model):
     body = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    users = db.relationship('User', secondary=shared_stories, lazy='subquery',
+        backref=db.backref('stories', lazy=True))
 
     def to_dict(self):
       return dict(id=self.id,
                   body=self.body,
-                  created_at=self.created_at.strftime('%Y-%m-%d %H:%M:%S'))
+                  by=self.creator.full_name(),
+                  created_at=self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                  users=[user.full_name() for user in self.users])
+
