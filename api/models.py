@@ -48,7 +48,7 @@ class User(db.Model):
         return user
 
     def to_dict(self):
-        return dict(id=self.id, username=self.username)
+        return dict(id=self.id, full_name=self.full_name())
 
 
 
