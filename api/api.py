@@ -5,7 +5,7 @@ api.py
 """
 
 from flask import Blueprint, jsonify, request, current_app
-
+import datetime
 from .models import db, Story, User
 from flask_jwt_extended import (
     jwt_required, create_access_token,
@@ -37,7 +37,8 @@ def login():
     if not user:
         return jsonify({ 'message': 'Invalid credentials', 'authenticated': False }), 401
 
-    token = access_token = create_access_token(identity=user.id)
+    expires = datetime.timedelta(days=7)
+    token = access_token = create_access_token(identity=user.id, expires_delta=expires)
     return jsonify({ 'token': token })
 
 @api.route('/users', methods=('GET',))
