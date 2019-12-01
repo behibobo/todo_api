@@ -52,11 +52,12 @@ def fetch_users():
 def create_story():
     data = request.get_json()
     print(data)
-    story = Story(body=data['body'])
-    for user_id in data['users']:
-        user = User.query.get(int(user_id))
-        story.users.append(user)
-        db.session.commit()
+    story = Story(body=data['body'], title=data['title'])
+    if 'users' in data:
+        for user_id in data['users']:
+            user = User.query.get(int(user_id))
+            story.users.append(user)
+            db.session.commit()
 
     story.creator = User.query.get(get_jwt_identity())
     db.session.add(story)
@@ -68,7 +69,10 @@ def create_story():
 @jwt_required
 def fetch_stories():
     stories = Story.query.filter_by(creator_id=get_jwt_identity())
-    return jsonify([i.to_dict() for i in stories])
+    user = User.query.get(get_jwt_identity())
+    shared_stories = user.stories
+    result = {"storeis": [i.to_dict() for i in stories], "shared_stories": [s.to_dict() for s in shared_stories] }
+    return jsonify(result)
 
 
 @api.route('/stories/<int:id>', methods=('GET', 'PUT'))

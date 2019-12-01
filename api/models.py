@@ -56,6 +56,7 @@ class Story(db.Model):
     __tablename__ = 'stories'
 
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text)
     body = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
@@ -64,6 +65,7 @@ class Story(db.Model):
 
     def to_dict(self):
       return dict(id=self.id,
+                  title=self.title,
                   body=self.body,
                   by=self.creator.full_name(),
                   created_at=self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
